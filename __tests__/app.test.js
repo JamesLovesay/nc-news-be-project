@@ -8,6 +8,15 @@ beforeEach(() => seed(data))
 afterAll(() => db.end());
 
 describe('app', () => {
+        test('status: 404, responds with "Path not found" if incorrect path is provided', () => {
+            return request(app)
+            .get('/not an endpoint')
+            .expect(404)
+            .then(({body: {msg}}) => {
+                expect(msg).toBe("404 - Path not found");
+            })
+        })
+
     describe('GET - api/topics', () => {
         test('status: 200, responds with array of topics with slug and description properties', () => {
             return request(app)
@@ -23,15 +32,6 @@ describe('app', () => {
                         })
                     )
                 })
-            })
-        })
-
-        test.only('status: 404, responds with "Path not found""= if incorrect path is provided', () => {
-            return request(app)
-            .get('/not an endpoint')
-            .expect(404)
-            .then(({body: {msg}}) => {
-                expect(msg).toBe("404 - Path not found");
             })
         })
     })
