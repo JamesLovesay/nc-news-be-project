@@ -42,9 +42,8 @@ describe('app - global', () => {
             return request(app)
             .get('/api/articles/1')
             .expect(200)
-            .then((article) => {
-                expect(article.body).toHaveLength(1);
-                expect(article.body[0]).toEqual(
+            .then(({ body }) => {
+                expect(body.article).toEqual(
                     expect.objectContaining({
                     article_id: 1,
                     title: "Living in the shadow of a great man",
@@ -56,7 +55,6 @@ describe('app - global', () => {
                   }))
             })
         })
-
         test('status: 404, responds with error of "article not found" if user selects endpoint with valid path but it does not exist', () => {
             return request(app)
             .get('/api/articles/45100')
