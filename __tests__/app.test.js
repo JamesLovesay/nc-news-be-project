@@ -153,7 +153,7 @@ describe('app - global', () => {
         })
     })
 
-    describe.only('GET - /api/users', () => {
+    describe('GET - /api/users', () => {
         test('status: 200, responds with an array of users containing the property username on receipt of a get request with a valid path', () => {
             return request(app)
             .get('/api/users')
