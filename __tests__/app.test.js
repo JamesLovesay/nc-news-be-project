@@ -42,9 +42,8 @@ describe('app', () => {
             return request(app)
             .get('/api/articles/1')
             .expect(200)
-            .then((article) => {
-                expect(article.body).toHaveLength(1);
-                expect(article.body[0]).toEqual(
+            .then(({ body }) => {
+                expect(body.article).toEqual(
                     expect.objectContaining({
                     article_id: 1,
                     title: "Living in the shadow of a great man",

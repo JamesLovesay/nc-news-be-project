@@ -11,10 +11,8 @@ exports.getTopics = (req, res, next) => {
 
 exports.getArticle = (req, res, next) => {
     const articleID  = req.params.article_id;
-    console.log(articleID)
     selectArticle(articleID).then((article) => {
-        console.log('Hello', '<--------------------------')
-        res.status(200).send(article);
+        res.status(200).send({article});
     })
     .catch((error) => {
         next(error);
