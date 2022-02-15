@@ -29,3 +29,10 @@ exports.amendArticleById = (articleId, changesToArticle) => {
     })
 }
 }
+
+exports.selectArticles = () => {
+    return db.query('SELECT * FROM articles ORDER BY created_at DESC;').then(({rows}) => {
+        console.log(rows)
+        return rows
+    })
+}
