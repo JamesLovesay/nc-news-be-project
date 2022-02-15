@@ -170,4 +170,16 @@ describe('app - global', () => {
             })
         })
     })
+
+    describe('GET - /api/articles', () => {
+        test('status: 200, responds with an array of article objects containing the correct properties if passed the correct path', () => {
+            return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.articles).toHaveLength(12)
+                expect(body.articles).toBeSortedBy("created_at", {descending: true});
+            })
+        })
+    })
 })
