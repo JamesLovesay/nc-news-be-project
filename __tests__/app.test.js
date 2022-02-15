@@ -152,4 +152,22 @@ describe('app - global', () => {
             })
         })
     })
+
+    describe.only('GET - /api/users', () => {
+        test('status: 200, responds with an array of users containing the property username on receipt of a get request with a valid path', () => {
+            return request(app)
+            .get('/api/users')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.users).toHaveLength(4)
+                body.users.forEach((user) => {
+                    expect(user).toEqual(
+                        expect.objectContaining({
+                            username: expect.any(String)
+                        })
+                    )
+                })
+            })
+        })
+    })
 })
