@@ -1,10 +1,11 @@
 const express = require('express');
 const app = express();
-const { getTopics, getArticle } = require('./controllers/controllers')
+const { getTopics, getArticle, updateArticleById } = require('./controllers/controllers')
 app.use(express.json());
 
 app.get('/api/topics', getTopics);
-app.get('/api/articles/:article_id', getArticle)
+app.get('/api/articles/:article_id', getArticle);
+app.put('/api/articles/:article_id', updateArticleById);
 
 
 app.all('/*', (req, res) => {
