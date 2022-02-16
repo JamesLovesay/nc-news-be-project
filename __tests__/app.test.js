@@ -86,7 +86,7 @@ describe('app - global', () => {
                     body: "I find this existence challenging",
                     created_at: expect.any(String),
                     votes: 100,
-                    comment_count: '11'
+                    comment_count: 11
                 }))
             })
         })
