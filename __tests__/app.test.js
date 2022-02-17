@@ -10,7 +10,7 @@ afterAll(() => db.end());
 describe('app - global', () => {
         test('status: 404, responds with "Path not found" if incorrect path is provided', () => {
             return request(app)
-            .get('/not an endpoint')
+            .get('/api/not an endpoint')
             .expect(404)
             .then(({body: {msg}}) => {
                 expect(msg).toBe("404 - Path not found");
@@ -221,4 +221,52 @@ describe('app - global', () => {
         })
     })
 
+    describe('GET - /api/articles/:article_id/comments', () => {
+        test('status: 200, responds with an array of comment objects for the given article containing the correct properties if passed a valid path', () => {
+            return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body: { comments } }) => {
+                expect(comments).toHaveLength(11)
+                comments.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String)
+                        })
+                    )
+                })
+            })
+        })
+        test('status: 404, responds with error of "this article could not be found" if user selects endpoint with valid path but it does not exist', () => {
+            return request(app)
+            .get('/api/articles/379/comments')
+            .expect(404)
+            .then(({ body: { msg }}) => {
+               expect(msg).toBe("404 - Article not found"); 
+            })
+        })
+        test('status: 400 for invalid article_id', () => {
+            return request(app)
+            .get('/api/articles/not-a-valid-id/comments')
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request"); 
+            })
+        })
+        test('status: 200, responds with empty array if passed valid article id but there are no comments', () => {
+            return request(app)
+            .get('/api/articles/2/comments')
+            .expect(200)
+            .then(({body: { comments }}) => {
+               expect(comments).toEqual([]);
+               expect(comments).toHaveLength(0); 
+            })
+        })
+
+    })
+})
 });
