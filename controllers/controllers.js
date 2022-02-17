@@ -1,4 +1,4 @@
-const { selectTopics, selectArticle, amendArticleById, selectArticles } = require('../models/models')
+const { selectTopics, selectArticle, amendArticleById, selectArticles, selectEndpointJson } = require('../models/models')
 
 exports.getTopics = (req, res, next) => {
     selectTopics().then((topics) => {
@@ -17,11 +17,9 @@ exports.getArticle = (req, res, next) => {
     .catch((error) => {
         next(error);
     })
-
 }
 
 exports.updateArticleById = (req, res, next) => {
-
     const articleId = req.params.article_id;
     const changesToArticle = req.body;
     amendArticleById(articleId, changesToArticle).then((updatedArticle) => {
@@ -36,4 +34,10 @@ exports.getArticles = (req, res, next) => {
     selectArticles().then((articles) => {
         res.status(200).send({articles})
     })
+}
+
+exports.getEndpointJson = (req, res, next) => {
+    const object = selectEndpointJson();
+    res.status(200).send({ object })
+
 }

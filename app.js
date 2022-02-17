@@ -1,17 +1,18 @@
 const express = require('express');
 const app = express();
-const { getTopics, getArticle, updateArticleById, getArticles } = require('./controllers/controllers')
+const { getTopics, getArticle, updateArticleById, getArticles, getEndpointJson } = require('./controllers/controllers')
 const { getUsers } = require('./controllers/user-controllers')
 const { getCommentsByArticleId, postComment } = require('./controllers/comments-controllers.js')
 app.use(express.json());
 
 app.get('/api/topics', getTopics);
-app.get('/api/articles/:article_id', getArticle);
-app.patch('/api/articles/:article_id', updateArticleById);
-app.get('/api/users', getUsers)
-app.get('/api/articles', getArticles)
-app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
-app.post('/api/articles/:article_id/comments', postComment)
+app.get('/api/articles/:article_id', getArticle); 
+app.patch('/api/articles/:article_id', updateArticleById); 
+app.get('/api/users', getUsers); 
+app.get('/api/articles', getArticles); 
+app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
+app.post('/api/articles/:article_id/comments', postComment);
+app.get('/api', getEndpointJson); 
 
 
 app.all('/*', (req, res) => {
