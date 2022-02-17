@@ -208,7 +208,7 @@ describe('app - global', () => {
             .get('/api/articles/379/comments')
             .expect(404)
             .then(({ body: { msg }}) => {
-               expect(msg).toBe("404 - Path not found"); 
+               expect(msg).toBe("404 - Article not found"); 
             })
         })
         test('status: 400 for invalid article_id', () => {

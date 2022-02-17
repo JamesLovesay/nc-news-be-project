@@ -40,7 +40,7 @@ exports.checkArticleExists = (articleId, comments) => {
     return db.query('SELECT * FROM articles WHERE article_id = $1;', [articleId])
     .then(({ rows }) => {
         if (rows.length === 0) {
-            return Promise.reject({ status: 404, msg: "404 - Path not found" })
+            return Promise.reject({ status: 404, msg: "404 - Article not found" })
         }
         return comments;
     })
