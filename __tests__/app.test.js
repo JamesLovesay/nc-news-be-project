@@ -266,7 +266,112 @@ describe('app - global', () => {
                expect(comments).toHaveLength(0); 
             })
         })
+    })
 
+    describe('POST - /api/articles/:article_id/comments', () => {
+        test('status: 201, responds with a copy of the posted comment', () => {
+            const newComment = {
+                username: "butter_bridge",
+                body: "some comment"
+            }
+            return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toEqual({ 
+                created_at: expect.any(String),
+                comment_id: 19,
+                author: "butter_bridge",
+                body: "some comment",
+                votes: 0,
+                article_id: 1
+            })
+            })
+        })
+        test('status: 404, test that post request returns 404 when passed an article that does not exist', () => {
+            const newComment = {
+                username: "butter_bridge",
+                body: "some comment"
+            }
+            return request(app)
+            .post('/api/articles/9585/comments')
+            .send(newComment)
+            .expect(404)
+            .then(({body: { msg }}) => {
+                expect(msg).toBe("article not found"); 
+             })
+        })
+        test('status: 400, responds with error of "bad request" if user selects endpoint with invalid path', () => {
+            const newComment = {
+                username: "butter_bridge",
+                body: "some comment"
+            }
+            return request(app)
+            .post('/api/articles/not-an-id/comments')
+            .send(newComment)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request"); 
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object that does not contain a username and body property', () => {
+            const newComment = {
+                username: "butter_bridge",
+            }
+            return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object that does not contain a username property', () => {
+            const newComment = {
+                body: "some comment"
+            }
+            return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object contains an empty string for body', () => {
+            const newComment = {
+                username: 'butter_bridge',
+                body: ""
+            }
+            return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 201, responds with correctly posted comment is the user provides an object with a username and body, but also with additional irrelevant properties.', () => {
+            const newComment = {
+                username: 'butter_bridge',
+                body: "some comment",
+                some_irrelevant_property: 'some irrelevant key'
+            }
+            return request(app)
+            .post('/api/articles/1/comments')
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.comment).toEqual({ 
+                created_at: expect.any(String),
+                comment_id: 19,
+                author: "butter_bridge",
+                body: "some comment",
+                votes: 0,
+                article_id: 1
+                })
+            })
+        })
     })
 })
-});
