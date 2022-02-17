@@ -220,6 +220,48 @@ describe('app - global', () => {
             })
         })
     })
+    
+    describe('GET - /api/articles (comment count)', () => {
+        test('status 200 - request for an article now includes comment count column as standard', () => {
+            return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({body: {articles}}) => {
+                expect(articles).toHaveLength(12)
+                articles.forEach((article) => {
+                    expect(article).toEqual(
+                        expect.objectContaining({
+                            article_id: expect.any(Number),
+                            title: expect.any(String),
+                            topic: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            comment_count: expect.any(Number)
+                        })
+                    )
+                })
+        })
+    })
+        test('status 200 - returns correct object and comment count for the most recent article', () => {
+            return request(app)
+            .get('/api/articles')
+            .expect(200)
+            .then(({body: {articles}}) => {
+                console.log(articles)
+                expect(articles[0]).toEqual({
+                    article_id: 3,
+                    title: 'Eight pug gifs that remind me of mitch',
+                    topic: 'mitch',
+                    author: 'icellusedkars',
+                    body: 'some gifs',
+                    created_at: '2020-11-03T09:12:00.000Z',
+                    votes: 0,
+                    comment_count: 2})
+                    })
+        })
+    })
 
     describe('GET - /api/articles/:article_id/comments', () => {
         test('status: 200, responds with an array of comment objects for the given article containing the correct properties if passed a valid path', () => {
@@ -268,5 +310,4 @@ describe('app - global', () => {
         })
 
     })
-})
 });
