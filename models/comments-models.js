@@ -11,7 +11,7 @@ exports.selectCommentsByArticleId = (id) => {
 }
 
 exports.addNewComment = (id, newComment) => {
-    if(newComment.hasOwnProperty('username') === false || newComment.hasOwnProperty('body') === false || newComment.body.length === 0) {
+    if(!newComment.hasOwnProperty('username') || !newComment.hasOwnProperty('body') || newComment.body.length === 0) {
         return Promise.reject({status: 400, msg: 'bad request by user'})
     } else {
     return db.query(`INSERT INTO comments (body, article_id, author, votes) VALUES ($1, $2, $3, 0) RETURNING *;`, [newComment.body, id, newComment.username]).then(({rows}) => {
