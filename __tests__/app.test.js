@@ -72,13 +72,31 @@ describe('app - global', () => {
                expect(msg).toBe("bad request"); 
             })
         })
+        test('status: 200, responds with the correct object and has a property of comment count if passed a valid endpoint', () => {
+            return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.article).toEqual(
+                    expect.objectContaining({
+                    article_id: 1,
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: expect.any(String),
+                    votes: 100,
+                    comment_count: 11
+                }))
+            })
+        })
     })
 
     describe('PATCH - /api/articles/:article_id', () => {
         test('test that patch request returns updated body when passed a valid request', () => {
             const updateToArticle = {inc_votes: 1}
             return request(app)
-            .put('/api/articles/1')
+            .patch('/api/articles/1')
             .send(updateToArticle)
             .expect(200)
             .then(({ body }) => {
@@ -96,7 +114,7 @@ describe('app - global', () => {
         test('test that patch request returns updated body when passed a valid request with a negative number', () => {
             const updateToArticle = {inc_votes: -1}
             return request(app)
-            .put('/api/articles/1')
+            .patch('/api/articles/1')
             .send(updateToArticle)
             .expect(200)
             .then(({ body }) => {
@@ -114,7 +132,7 @@ describe('app - global', () => {
         test('status: 404, test that patch request returns 404 when passed an article that does not exist', () => {
             const updateToArticle = {inc_votes: 1}
             return request(app)
-            .put('/api/articles/985')
+            .patch('/api/articles/985')
             .send(updateToArticle)
             .expect(404)
             .then(({body: { msg }}) => {
@@ -124,7 +142,7 @@ describe('app - global', () => {
         test('status: 400, responds with error of "bad request" if user selects endpoint with invalid path', () => {
             const updateToArticle = {inc_votes : 1}
             return request(app)
-            .put('/api/articles/not-an-id')
+            .patch('/api/articles/not-an-id')
             .send(updateToArticle)
             .expect(400)
             .then(({body: { msg }}) => {
@@ -134,7 +152,7 @@ describe('app - global', () => {
         test('status: 400, responds with error of "bad request by user" if user provides an object that does not contain an inc_votes property', () => {
             const updateToArticle = {some_irrelevant_property : 1}
             return request(app)
-            .put('/api/articles/1')
+            .patch('/api/articles/1')
             .send(updateToArticle)
             .expect(400)
             .then(({body: { msg }}) => {
@@ -144,11 +162,31 @@ describe('app - global', () => {
         test('status: 400, responds with error of "bad request by user" if user provides an object that contains an inc_votes property, but the value of that property is not a number', () => {
             const updateToArticle = {inc_votes : "not a number"}
             return request(app)
-            .put('/api/articles/1')
+            .patch('/api/articles/1')
             .send(updateToArticle)
             .expect(400)
             .then(({body: { msg }}) => {
                expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 200, responds with successful status, amends the votes and does not amend other properties on the article if passed additoinal properties', () => {
+            const updateToArticle = {inc_votes : -1,
+            title: "Not this article's title"
+        }
+            return request(app)
+            .patch('/api/articles/1')
+            .send(updateToArticle)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.updatedArticle).toEqual({
+                    article_id: 1,
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: "2020-07-09T20:11:00.000Z",
+                    votes: 99,
+                })
             })
         })
     })
@@ -231,4 +269,4 @@ describe('app - global', () => {
 
     })
 })
-
+});
