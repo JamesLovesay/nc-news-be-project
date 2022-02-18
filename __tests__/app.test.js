@@ -249,7 +249,6 @@ describe('app - global', () => {
             .get('/api/articles')
             .expect(200)
             .then(({body: {articles}}) => {
-                console.log(articles)
                 expect(articles[0]).toEqual({
                     article_id: 3,
                     title: 'Eight pug gifs that remind me of mitch',
@@ -415,5 +414,24 @@ describe('app - global', () => {
                 })
             })
         })
+    })
+
+    describe('DELETE - /api/comments/:comment_id', () => {
+        test('status: 204, returns successful status and no content when passed a valid comment id, with the number of comments relating to the article it is linked to being reduced by one.', () => {
+            return request(app)
+            .delete('/api/comments/18')
+            .expect(204)
+            .then(({ body }) => {
+                expect(body).toEqual({})
+            })
+            .then(() => {
+            return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body: { comments } }) => {
+                expect(comments).toHaveLength(10)
+            })
+            })
+        })  
     })
 });
