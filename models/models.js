@@ -20,7 +20,7 @@ exports.amendArticleById = (articleId, changesToArticle) => {
         return Promise.reject({status: 400, msg: "bad request by user"})
     } else {
     const { inc_votes } = changesToArticle;
-    return db.query('UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *', [inc_votes, articleId])
+    return db.query('UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;', [inc_votes, articleId])
     .then(({rows}) => {
         if(rows.length === 0) {
             return Promise.reject({status: 404, msg: "article not found"});
@@ -30,10 +30,31 @@ exports.amendArticleById = (articleId, changesToArticle) => {
 }
 }
 
-exports.selectArticles = () => {
-    return db.query('SELECT articles.*, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ORDER BY created_at DESC;').then(({rows}) => {
-        return rows
-    })
+exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic) => {
+    const validSortBy = ['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'];
+    const validOrder = ['asc', 'desc', 'ASC', 'DESC'];
+    const validTopics = ['cats', 'mitch', 'paper'];
+
+    if((topic && !validTopics.includes(topic)) || !validSortBy.includes(sort_by) || !validOrder.includes(order)) {
+        if(!validSortBy.includes(sort_by) || !validOrder.includes(order)) {
+            return Promise.reject({status: 400, msg: 'Invalid sort query'})
+        }
+        if(topic && !validTopics.includes(topic)) {
+            return Promise.reject({status: 404, msg: '404 - topic not found'})
+        }
+    } else {
+        queryValues = [];
+        let queryStr = `SELECT articles.*, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
+        if(topic) {
+            queryStr += 'WHERE topic = $1 '
+            queryValues.push(topic)
+        }
+        queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()};`
+        return db.query(queryStr, queryValues)
+        .then(({rows}) => {
+            return rows
+            })
+        }
 }
 
 exports.checkArticleExists = (articleId, comments) => {
