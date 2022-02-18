@@ -543,6 +543,7 @@ describe('app - global', () => {
                 expect(comments).toHaveLength(10)
             })
             })
-        })  
+            })  
+        })
     })
 });
