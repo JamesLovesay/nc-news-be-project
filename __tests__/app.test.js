@@ -417,7 +417,7 @@ describe('app - global', () => {
         })
     })
 
-    describe('GET - /api/articles (queries)', () => {
+    describe.only('GET - /api/articles (queries)', () => {
         test('status: 200, responds with correctly sorted array of objects if passed a valid query', () => {
             return request(app)
             .get('/api/articles/?sort_by=title&order=desc')
@@ -434,6 +434,42 @@ describe('app - global', () => {
             .then(({body: { articles }}) => {
                 expect(articles).toHaveLength(12); 
                 expect(articles).toBeSortedBy('body')
+             })
+        })
+        test('status: 200, responds with correctly sorted array of objects if passed query to sort by author column', () => {
+            return request(app)
+            .get('/api/articles/?sort_by=author&order=asc')
+            .expect(200)
+            .then(({body: { articles }}) => {
+                expect(articles).toHaveLength(12); 
+                expect(articles).toBeSortedBy('author')
+             })
+        })
+        test('status: 200, responds with correctly sorted array of objects if passed query to sort by topic column in descending order', () => {
+            return request(app)
+            .get('/api/articles/?sort_by=topic&order=DESC')
+            .expect(200)
+            .then(({body: { articles }}) => {
+                expect(articles).toHaveLength(12); 
+                expect(articles).toBeSortedBy('topic', {descending: true})
+             })
+        })
+        test('status: 200, responds with correctly sorted array of objects if passed query to sort by created_at column in ascending order', () => {
+            return request(app)
+            .get('/api/articles/?sort_by=created_at&order=ASC')
+            .expect(200)
+            .then(({body: { articles }}) => {
+                expect(articles).toHaveLength(12); 
+                expect(articles).toBeSortedBy('created_at')
+             })
+        })
+        test('status: 200, responds with correctly sorted array of objects if passed query to sort by votes column in descending order', () => {
+            return request(app)
+            .get('/api/articles/?sort_by=votes&order=desc')
+            .expect(200)
+            .then(({body: { articles }}) => {
+                expect(articles).toHaveLength(12); 
+                expect(articles).toBeSortedBy('votes', {descending: true})
              })
         })
         test('status: 200, responds with correctly filtered array of objects if passed a topic query of cats', () => {
@@ -469,12 +505,12 @@ describe('app - global', () => {
                 expect(msg).toBe("Invalid sort query"); 
             })
         })
-        test('status: 400, responds with bad request when user tries to filter by a topic that does not exist', () => {
+        test('status: 404, responds with topic not found when user tries to filter by a topic that does not exist', () => {
             return request(app)
             .get('/api/articles/?topic=TopicDoesNotExist')
-            .expect(400)
+            .expect(404)
             .then(({body: { msg }}) => {
-                expect(msg).toBe("Invalid sort query"); 
+                expect(msg).toBe("404 - topic not found"); 
             })
         })
         test('status: 200, responds with empty array user tries to filter by a topic that exists, but there are no articles on that topic', () => {

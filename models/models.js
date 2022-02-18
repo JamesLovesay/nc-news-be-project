@@ -36,7 +36,12 @@ exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic) => {
     const validTopics = ['cats', 'mitch', 'paper'];
 
     if((topic && !validTopics.includes(topic)) || !validSortBy.includes(sort_by) || !validOrder.includes(order)) {
-        return Promise.reject({status: 400, msg: 'Invalid sort query'})
+        if(!validSortBy.includes(sort_by) || !validOrder.includes(order)) {
+            return Promise.reject({status: 400, msg: 'Invalid sort query'})
+        }
+        if(topic && !validTopics.includes(topic)) {
+            return Promise.reject({status: 404, msg: '404 - topic not found'})
+        }
     } else {
         queryValues = [];
         let queryStr = `SELECT articles.*, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
