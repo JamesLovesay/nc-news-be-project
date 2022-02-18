@@ -417,7 +417,7 @@ describe('app - global', () => {
         })
     })
 
-    describe.only('GET - /api/articles (queries)', () => {
+    describe('GET - /api/articles (queries)', () => {
         test('status: 200, responds with correctly sorted array of objects if passed a valid query', () => {
             return request(app)
             .get('/api/articles/?sort_by=title&order=desc')
