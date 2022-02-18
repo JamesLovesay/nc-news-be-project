@@ -1,6 +1,6 @@
 NC-news-project
 
-This is a link to the hosted version of this project - <link>
+This is a link to the hosted version of this project - <https://nc-news-back-end-project.herokuapp.com/>
 
 The project is an api with multiple endpoints that allow the user to interact with the information in the test and development databases, including GET, PATCH, POST and DELETE requests. A summary of the endpoints available can be obtained with a GET request to '/api' and a full summary of the endpoints can be found in the endpoints.json file. 
 

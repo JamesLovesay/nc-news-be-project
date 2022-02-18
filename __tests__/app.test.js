@@ -661,4 +661,5 @@ describe('app - global', () => {
             })  
         })
     })
+})
 });
