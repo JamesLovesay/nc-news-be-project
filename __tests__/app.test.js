@@ -37,7 +37,7 @@ describe('app - global', () => {
     })
 
     
-    describe('GET - api/articles/:article', () => {
+    describe('GET - api/articles/:article_id', () => {
         test('status: 200, responds with correct article object on valid request', () => {
             return request(app)
             .get('/api/articles/1')
@@ -249,7 +249,6 @@ describe('app - global', () => {
             .get('/api/articles')
             .expect(200)
             .then(({body: {articles}}) => {
-                console.log(articles)
                 expect(articles[0]).toEqual({
                     article_id: 3,
                     title: 'Eight pug gifs that remind me of mitch',
@@ -416,7 +415,7 @@ describe('app - global', () => {
             })
         })
     })
-
+  
     describe('GET - /api/articles (queries)', () => {
         test('status: 200, responds with correctly sorted array of objects if passed a valid query', () => {
             return request(app)
@@ -531,5 +530,134 @@ describe('app - global', () => {
                 expect(articles).toBeSortedBy('body', {descending: true})
              })
         })
+      
+    describe('GET - /api', () => {
+        test('status 200: responds with the JSON object setting out the endpoints available on the api', () => {
+            return request(app)
+            .get('/api')
+            .expect(200)
+            .then(({ body: { object }}) => {
+                expect(object).toEqual({
+                    "GET /api": {
+                      "description": "serves up a json representation of all the available endpoints of the api"
+                    },
+                    "GET /api/topics": {
+                      "description": "serves an array of all topics",
+                      "queries": [],
+                      "exampleResponse": {
+                        "topics": [{ "slug": "football", "description": "Footie!" }]
+                      }
+                    },
+                    "GET /api/articles": {
+                      "description": "serves an array of all topics which can be sorted by title, topic, author, body, created_at or comment count, either in ascending or descending order, and can be filtered by the topics mitch, paper or cats",
+                      "queries": ["author", "topic", "sort_by", "order"],
+                      "exampleResponse": {
+                        "articles": [
+                          {
+                            "title": "Seafood substitutions are increasing",
+                            "topic": "cooking",
+                            "author": "weegembump",
+                            "body": "Text from the article..",
+                            "created_at": 1527695953341, 
+                            "comment_count": 4
+                          }
+                        ]
+                      }
+                    },
+                    "GET /api/articles/:article_id": {
+                      "description": "serves up an object containing the details of the article requested by the user",
+                      "queries": [],
+                      "exampleResponse": {
+                        "article_id": 1,
+                        "title": "Living in the shadow of a great man",
+                        "topic": "mitch",
+                        "author": "butter_bridge",
+                        "body": "I find this existence challenging",
+                        "created_at": 1594329060000,
+                        "votes": 100
+                      }
+                    },
+                    "PATCH /api/articles/:article_id": {
+                      "description": "serves up an object containing the details of the updated article following a request for an amendment to the number of votes for the article by the user",
+                      "queries": ["inc_votes"],
+                      "exampleResponse": {
+                        "updatedArticle": {
+                        "article_id": 1,
+                        "title": "Living in the shadow of a great man",
+                        "topic": "mitch",
+                        "author": "butter_bridge",
+                        "body": "I find this existence challenging",
+                        "created_at": "2020-07-09T20:11:00.000Z",
+                        "votes": 101
+                        }
+                      }
+                    }, 
+                    "GET /api/users": {
+                      "description": "serves up an array of all usernames",
+                      "queries": [],
+                      "exampleResponse": {
+                        "users": [
+                          {"username": "butter_bridge"},
+                          {"username": "icellusedkars"}
+                        ]
+                      }
+                    },
+                    "GET /api/articles/:article_id/comments": {
+                      "description": "serves up an array of comments relating to the article id specified by the user",
+                      "queries": [],
+                      "exampleResponse": {
+                        "comments": [
+                          {
+                          "comment_id": 13,
+                          "votes": 0,
+                          "created_at": "2020-06-15T10:25:00.000Z",
+                          "author": "icellusedkars",
+                          "body": "Fruit pastilles"
+                          }
+                        ]
+                      }
+                    }, 
+                    "POST /api/articles/:article_id/comments": {
+                      "description": "serves up an object containing the details of the comment that the user posts to the specified article id",
+                      "queries": ["username", "body"],
+                      "exampleResponse": {
+                        "comment": {
+                            "created_at": "2020-06-15T10:25:00.000Z", 
+                            "comment_id": 19,
+                            "author": "butter_bridge",
+                            "body": "comment on the article",
+                            "votes": 0,
+                            "article_id": 1
+                        }
+                      }
+                    }, 
+                    "DELETE /api/comments/:comment_id": {
+                      "description": "serves up an empty object confirming that the comment input by the user has been deleted and the content is no longer available",
+                      "queries": [],
+                      "exampleResponse": {
+                        "comment": {}
+                      }
+                    }
+                  })
+            })
+        })
+      
+    describe('DELETE - /api/comments/:comment_id', () => {
+        test('status: 204, returns successful status and no content when passed a valid comment id, with the number of comments relating to the article it is linked to being reduced by one.', () => {
+            return request(app)
+            .delete('/api/comments/18')
+            .expect(204)
+            .then(({ body }) => {
+                expect(body).toEqual({})
+            })
+            .then(() => {
+            return request(app)
+            .get('/api/articles/1/comments')
+            .expect(200)
+            .then(({ body: { comments } }) => {
+                expect(comments).toHaveLength(10)
+            })
+            })
+        })  
     })
 });

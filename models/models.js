@@ -66,3 +66,8 @@ exports.checkArticleExists = (articleId, comments) => {
         return comments;
     })
 }
+
+exports.selectEndpointJson = () => {
+    const object = require('../endpoints.json')
+    return object;
+}
