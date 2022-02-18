@@ -1,19 +1,17 @@
 const express = require('express');
 const app = express();
-const { getTopics, getArticle, updateArticleById, getArticles, getEndpointJson } = require('./controllers/controllers')
-const { getUsers } = require('./controllers/user-controllers')
-const { getCommentsByArticleId, postComment, removeCommentById } = require('./controllers/comments-controllers.js')
-app.use(express.json());
+const apiRouter = require('./routes/api-router');
+const topicsRouter = require('./routes/topics-router')
+const articlesRouter = require('./routes/articles-router')
+const usersRouter = require('./routes/users-router');
+const commentsRouter = require('./routes/comments-router');
 
-app.get('/api/topics', getTopics);
-app.get('/api/articles/:article_id', getArticle); 
-app.patch('/api/articles/:article_id', updateArticleById); 
-app.get('/api/users', getUsers); 
-app.get('/api/articles', getArticles); 
-app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
-app.post('/api/articles/:article_id/comments', postComment);
-app.get('/api', getEndpointJson); 
-app.delete('/api/comments/:comment_id', removeCommentById)
+app.use(express.json());
+app.use('/api', apiRouter);
+app.use('/api/topics', topicsRouter);
+app.use('/api/articles', articlesRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/comments', commentsRouter)
 
 app.all('/*', (req, res) => {
     res.status(404).send({ msg: '404 - Path not found'})
