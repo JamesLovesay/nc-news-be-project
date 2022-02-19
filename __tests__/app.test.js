@@ -649,6 +649,13 @@ describe('app - global', () => {
                         "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
                        }
                       }
+                    },
+                    "DELETE /api/articles/:article_id": {
+                      "description": "serves up an empty object confirming that the article input by the user has been deleted and the content is no longer available",
+                      "queries": [],
+                      "exampleResponse": {
+                        "article": {}
+                      }
                     }
                   })
             })
