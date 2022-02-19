@@ -530,6 +530,7 @@ describe('app - global', () => {
                 expect(articles).toBeSortedBy('body', {descending: true})
              })
         })
+    })
       
     describe('GET - /api', () => {
         test('status 200: responds with the JSON object setting out the endpoints available on the api', () => {
@@ -641,7 +642,8 @@ describe('app - global', () => {
                   })
             })
         })
-      
+    })
+
     describe('DELETE - /api/comments/:comment_id', () => {
         test('status: 204, returns successful status and no content when passed a valid comment id, with the number of comments relating to the article it is linked to being reduced by one.', () => {
             return request(app)
@@ -658,8 +660,30 @@ describe('app - global', () => {
                 expect(comments).toHaveLength(10)
             })
             })
-            })  
+        })  
+    })
+
+    describe('GET - /api/users/:username', () => {
+        test('status: 200, responds with correct username object on valid request', () => {
+            return request(app)
+            .get('/api/users/icellusedkars')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.user).toEqual(
+                    expect.objectContaining({
+                    username: 'icellusedkars',
+                    name: 'sam',
+                    avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4'
+                  }))
+            })
+        })
+        test('status: 404, responds with error of "username not found" if user selects endpoint with valid path but it does not exist', () => {
+            return request(app)
+            .get('/api/users/not-a-username')
+            .expect(404)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("username not found"); 
+            })
         })
     })
-})
 });
