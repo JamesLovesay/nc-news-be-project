@@ -697,4 +697,39 @@ describe('app - global', () => {
             })
         })
     })
+
+    describe('DELETE - /api/articles/:article_id', () => {
+        test('status: 204, returns successful status and no content when passed a valid article id, with the number of articles being reduced by one.', () => {
+            return request(app)
+            .delete('/api/articles/2')
+            .expect(204)
+            .then(({ body }) => {
+                expect(body).toEqual({})
+            })
+            .then(() => {
+            return request(app)
+            .get('/api/articles/')
+            .expect(200)
+            .then(({ body: { articles } }) => {
+                expect(articles).toHaveLength(11)
+            })
+            })
+        })  
+        test('status: 400, bad request if user tries to delete by an id that is invalid.', () => {
+            return request(app)
+            .delete('/api/articles/not-a-valid-id')
+            .expect(400)
+            .then(({body: { msg }}) => {
+                expect(msg).toBe("bad request"); 
+            })
+        })  
+        test('status: 404, article not found if passed a valid id but the article does not exist.', () => {
+            return request(app)
+            .delete('/api/articles/89565')
+            .expect(404)
+            .then(({body: { msg }}) => {
+                expect(msg).toBe("404 - Article not found"); 
+            })
+        })  
+    })
 });

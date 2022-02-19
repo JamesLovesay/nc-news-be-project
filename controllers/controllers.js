@@ -1,4 +1,4 @@
-const { selectTopics, selectArticle, amendArticleById, selectArticles, selectEndpointJson } = require('../models/models')
+const { selectTopics, selectArticle, amendArticleById, selectArticles, selectEndpointJson, deleteArticleById, checkArticleExists } = require('../models/models')
 
 exports.getTopics = (req, res, next) => {
     selectTopics().then((topics) => {
@@ -44,4 +44,15 @@ exports.getEndpointJson = (req, res, next) => {
     const object = selectEndpointJson();
     res.status(200).send({ object })
 
+}
+
+exports.removeArticleById = (req, res, next) => {
+    const { article_id: id } = req.params;
+    Promise.all([deleteArticleById(id), checkArticleExists(id)])
+    .then(([response]) => {
+        res.status(204).send({ response })
+    })
+    .catch((err) => {
+        next(err);
+    })
 }

@@ -1,4 +1,5 @@
 const db = require('../db/connection.js');
+let numberofArticles = 12;
 
 exports.selectTopics = () => {
     return db.query('SELECT * FROM topics;').then(({rows}) => {
@@ -70,4 +71,16 @@ exports.checkArticleExists = (articleId, comments) => {
 exports.selectEndpointJson = () => {
     const object = require('../endpoints.json')
     return object;
+}
+
+exports.deleteArticleById = (id) => {
+    return db.query('DELETE FROM articles WHERE article_id = $1;', [id])
+    .then(({ rows }) => {
+        return rows;
+        })
+    // } else if (id > numberofArticles) {
+    //     return Promise.reject({ status: 404, msg: "article not found"})
+    // } else {
+    //     return Promise.reject({ status: 400, msg: "invalid article id"})
+    // }
 }
