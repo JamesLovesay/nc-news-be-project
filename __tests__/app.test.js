@@ -638,6 +638,17 @@ describe('app - global', () => {
                       "exampleResponse": {
                         "comment": {}
                       }
+                    },
+                    "GET /api/users/:username": {
+                      "description": "serves up an object containing the details of the user relating to the username that the client provides in the request",
+                      "queries": ["username"],
+                      "exampleResponse": {
+                       "user": {
+                        "username": "icellusedkars",
+                        "name": "sam",
+                        "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+                       }
+                      }
                     }
                   })
             })
