@@ -656,6 +656,20 @@ describe('app - global', () => {
                       "exampleResponse": {
                         "article": {}
                       }
+                    },
+                    "PATCH /api/comments/:comment_id": {
+                      "description": "serves up an object containing the details of the updated comment following a request for an amendment to the number of votes for the comment by the user",
+                      "queries": ["inc_votes"],
+                      "exampleResponse": {
+                        "comment": {
+                          "comment_id": 1,
+                          "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                          "votes": 15,
+                          "author": "butter_bridge",
+                          "article_id": 9,
+                          "created_at": 1586179020000,
+                        }
+                      }
                     }
                   })
             })
@@ -754,5 +768,128 @@ describe('app - global', () => {
                 expect(msg).toBe("404 - Article not found"); 
             })
         })  
+    })
+
+    // describe('POST - /api/articles', () => {
+    //     test('status: 201, responds with a copy of the posted article', () => {
+    //         const newArticle = {
+    //             author: "butter_bridge",
+    //             body: "article content",
+    //             title: "title of the article",
+    //             topic: "mitch"
+    //         }
+    //         return request(app)
+    //         .post('/api/articles')
+    //         .send(newArticle)
+    //         .expect(201)
+    //         .then(({ body }) => {
+    //             expect(body.article).toEqual({ 
+    //             created_at: expect.any(String),
+    //             article_id: 13,
+    //             author: "butter_bridge",
+    //             body: "article content",
+    //             title: "title of the article",
+    //             topic: "mitch",
+    //             votes: 0,
+    //             comment_count: 0
+    //         })
+    //         })
+    //     })
+    // })
+
+    describe('PATCH - /api/comments/:comment_id', () => {
+        test('test that patch request returns updated body when passed a valid request', () => {
+            const updateToComment = {inc_votes: 1}
+            return request(app)
+            .patch('/api/comments/1')
+            .send(updateToComment)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment).toEqual({
+                    comment_id: 1,
+                    body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                    votes: 17,
+                    author: "butter_bridge",
+                    article_id: 9,
+                    created_at: expect.any(String)
+                  })
+            })
+        })
+        test('test that patch request returns updated body when passed a valid request with a negative number', () => {
+            const updateToComment = {inc_votes: -1}
+            return request(app)
+            .patch('/api/comments/1')
+            .send(updateToComment)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment).toEqual({
+                    comment_id: 1,
+                    body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                    votes: 15,
+                    author: "butter_bridge",
+                    article_id: 9,
+                    created_at: expect.any(String)
+                  })
+            })
+        })
+        test('status: 404, test that patch request returns 404 when passed an article that does not exist', () => {
+            const updateToComment = {inc_votes: 1}
+            return request(app)
+            .patch('/api/comments/1985')
+            .send(updateToComment)
+            .expect(404)
+            .then(({body: { msg }}) => {
+                expect(msg).toBe("comment not found"); 
+             })
+        })
+        test('status: 400, responds with error of "bad request" if user selects endpoint with invalid path', () => {
+            const updateToComment = {inc_votes : 1}
+            return request(app)
+            .patch('/api/comments/not-an-id')
+            .send(updateToComment)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request"); 
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object that does not contain an inc_votes property', () => {
+            const updateToComment = {some_irrelevant_property : 1}
+            return request(app)
+            .patch('/api/comments/1')
+            .send(updateToComment)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object that contains an inc_votes property, but the value of that property is not a number', () => {
+            const updateToComment = {inc_votes : "not a number"}
+            return request(app)
+            .patch('/api/comments/1')
+            .send(updateToComment)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 200, responds with successful status, amends the votes and does not amend other properties on the article if passed additoinal properties', () => {
+            const updateToComment = {inc_votes : -1,
+            body: "Not this comment's body"
+        }
+            return request(app)
+            .patch('/api/comments/1')
+            .send(updateToComment)
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comment).toEqual({
+                    comment_id: 1,
+                    body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                    votes: 15,
+                    author: "butter_bridge",
+                    article_id: 9,
+                    created_at: expect.any(String)
+                  })
+            })
+        })
     })
 });

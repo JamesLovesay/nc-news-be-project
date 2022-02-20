@@ -1,4 +1,4 @@
-const { selectCommentsByArticleId, addNewComment, deleteCommentById } = require('../models/comments-models')
+const { selectCommentsByArticleId, addNewComment, deleteCommentById, amendCommentById } = require('../models/comments-models')
 const { checkArticleExists } = require('../models/models')
 const { checkCommentExists } = require('../utils/comments-utils.js')
 
@@ -31,5 +31,16 @@ exports.removeCommentById = (req, res, next) => {
     })
     .catch((error) => {
         next(error)
+    })
+}
+
+exports.updateCommentById = (req, res, next) => {
+    const commentId = req.params.comment_id;
+    const changesToComment = req.body;
+    amendCommentById(commentId, changesToComment).then((comment) => {
+        res.status(200).send({ comment })
+    })
+    .catch((err) => {
+        next(err)
     })
 }
