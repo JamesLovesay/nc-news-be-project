@@ -90,11 +90,12 @@ exports.deleteArticleById = (id) => {
 }
 
 exports.addNewArticle = (newArticle) => {
+    propertiesToTest = ["author", "body", "title", "topic"];
+    if(!propertiesToTest.every(i => i in newArticle) || newArticle.body.length === 0 || newArticle.title.length === 0) {
+        return Promise.reject({status: 400, msg: "bad request by user"})
+    }
     return db.query('INSERT INTO articles (title, topic, author, body) VALUES ($1, $2, $3, $4) RETURNING *;', [newArticle.title, newArticle.topic, newArticle.author, newArticle.body])
     .then(({ rows }) => {
         return rows[0];
-    })
-    .then((article) => {
-    return this.checkArticleExists(article.article_id)
     })
 }

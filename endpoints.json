@@ -140,5 +140,21 @@
         "description": "description here"
     }
     }
+  },
+  "POST /api/articles": {
+    "description": "serves up an object containing the details of the article that the user posts database along with a comment count",
+    "queries": ["author", "body", "title", "topic"],
+    "exampleResponse": {
+      "article": { 
+        "created_at": 1594329060000,
+        "article_id": 13,
+        "author": "butter_bridge",
+        "body": "body of the article",
+        "title": "title of the article",
+        "topic": "mitch",
+        "votes": 0,
+        "comment_count": 0
+        }
+    }
   }
 }

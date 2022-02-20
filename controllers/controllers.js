@@ -70,6 +70,7 @@ exports.postArticle = (req, res, next) => {
     const newArticle = req.body;
     addNewArticle(newArticle)
     .then((article) => {
+        article.comment_count = 0;
         res.status(201).send({ article })
     })
     .catch((err) => {

@@ -55,7 +55,7 @@ describe('app - global', () => {
                   }))
             })
         })
-        test('status: 404, responds with error of "article not found" if user selects endpoint with valid path but it does not exist', () => {
+        test('status: 404, responds with error of "resource not found" if user selects endpoint with valid path but it does not exist', () => {
             return request(app)
             .get('/api/articles/45100')
             .expect(404)
@@ -340,7 +340,7 @@ describe('app - global', () => {
             .send(newComment)
             .expect(404)
             .then(({body: { msg }}) => {
-                expect(msg).toBe("article not found"); 
+                expect(msg).toBe("resource not found"); 
              })
         })
         test('status: 400, responds with error of "bad request" if user selects endpoint with invalid path', () => {
@@ -680,6 +680,22 @@ describe('app - global', () => {
                           "description": "description here"
                       }
                       }
+                    },
+                    "POST /api/articles": {
+                      "description": "serves up an object containing the details of the article that the user posts database along with a comment count",
+                      "queries": ["author", "body", "title", "topic"],
+                      "exampleResponse": {
+                        "article": { 
+                          "created_at": 1594329060000,
+                          "article_id": 13,
+                          "author": "butter_bridge",
+                          "body": "body of the article",
+                          "title": "title of the article",
+                          "topic": "mitch",
+                          "votes": 0,
+                          "comment_count": 0
+                          }
+                      }
                     }
                   })
             })
@@ -780,32 +796,130 @@ describe('app - global', () => {
         })  
     })
 
-    // describe.only('POST - /api/articles', () => {
-    //     test('status: 201, responds with a copy of the posted article', () => {
-    //         const newArticle = {
-    //             author: "butter_bridge",
-    //             body: "article content",
-    //             title: "title of the article",
-    //             topic: "mitch"
-    //         }
-    //         return request(app)
-    //         .post('/api/articles')
-    //         .send(newArticle)
-    //         .expect(201)
-    //         .then(({ body }) => {
-    //             expect(body.article).toEqual({ 
-    //             created_at: expect.any(String),
-    //             article_id: 13,
-    //             author: "butter_bridge",
-    //             body: "article content",
-    //             title: "title of the article",
-    //             topic: "mitch",
-    //             votes: 0,
-    //             comment_count: 0
-    //         })
-    //         })
-    //     })
-    // })
+    describe('POST - /api/articles', () => {
+        test('status: 201, responds with a copy of the posted article', () => {
+            const newArticle = {
+                author: "butter_bridge",
+                body: "article content",
+                title: "title of the article",
+                topic: "mitch"
+            }
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.article).toEqual({ 
+                created_at: expect.any(String),
+                article_id: 13,
+                author: "butter_bridge",
+                body: "article content",
+                title: "title of the article",
+                topic: "mitch",
+                votes: 0,
+                comment_count: 0
+                })
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object that does not contain all required properties', () => {
+            const newArticle = {
+                author: "butter_bridge",
+                body: "article content",
+                title: "title of the article",
+            }
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object that does not contain an author property', () => {
+            const newArticle = {
+                body: "article content",
+                title: "title of the article",
+                topic: "mitch"
+            }
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object contains an empty string for body', () => {
+            const newArticle = {
+                author: "butter_bridge",
+                body: "",
+                title: "title of the article",
+                topic: "mitch"
+            }
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 201, responds with correctly posted article is the user provides an object with correct properties, but also with additional irrelevant properties.', () => {
+            const newArticle = {
+                author: "butter_bridge",
+                body: "body of the article",
+                title: "title of the article",
+                topic: "mitch",
+                irrelevantProperty: "Irrelevant value"
+            }
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.article).toEqual({ 
+                    created_at: expect.any(String),
+                    article_id: 13,
+                    author: "butter_bridge",
+                    body: "body of the article",
+                    title: "title of the article",
+                    topic: "mitch",
+                    votes: 0,
+                    comment_count: 0
+                    })
+            })
+        })
+        test('status 404: not found if the user provides an author name that does not exist in the user databse', () => {
+            const newArticle = {
+                author: "not a valid user",
+                body: "body of the article",
+                title: "title of the article",
+                topic: "mitch",
+            } 
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(404)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("resource not found"); 
+            })
+        })
+        test('status 404: not found if the user provides a topic name that does not exist in the topic databse', () => {
+            const newArticle = {
+                author: "butter_bridge",
+                body: "body of the article",
+                title: "title of the article",
+                topic: "Not a valid topic",
+            } 
+            return request(app)
+            .post('/api/articles')
+            .send(newArticle)
+            .expect(404)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("resource not found"); 
+            })
+        })
+    })
 
     describe('PATCH - /api/comments/:comment_id', () => {
         test('test that patch request returns updated body when passed a valid request', () => {
