@@ -670,6 +670,16 @@ describe('app - global', () => {
                           "created_at": 1586179020000,
                         }
                       }
+                    },
+                    "POST /api/topics": {
+                      "description": "serves up an object containing the details of the topic that the user posts database",
+                      "queries": ["slug", "description"],
+                      "exampleResponse": {
+                        "topic": {
+                          "slug": "topic name here",
+                          "description": "description here"
+                      }
+                      }
                     }
                   })
             })
@@ -770,7 +780,7 @@ describe('app - global', () => {
         })  
     })
 
-    // describe('POST - /api/articles', () => {
+    // describe.only('POST - /api/articles', () => {
     //     test('status: 201, responds with a copy of the posted article', () => {
     //         const newArticle = {
     //             author: "butter_bridge",
@@ -889,6 +899,68 @@ describe('app - global', () => {
                     article_id: 9,
                     created_at: expect.any(String)
                   })
+            })
+        })
+    })
+
+    describe('POST - /api/topics', () => {
+        test('status: 201, responds with a copy of the posted topic', () => {
+            const newTopic = {
+                slug: "topic name here",
+                description: "description here"
+              }
+            return request(app)
+            .post('/api/topics')
+            .send(newTopic)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.topic).toEqual({
+                    slug: "topic name here",
+                    description: "description here"
+                })
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object that does not contain a slug and description property', () => {
+            const newTopic = {
+                NotSlug: "topic name here",
+                NotDescription: "description here"
+              }
+            return request(app)
+            .post('/api/topics')
+            .send(newTopic)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 400, responds with error of "bad request by user" if user provides an object contains an empty string for body or slug', () => {
+            const newTopic = {
+                slug: "",
+                description: "description here"
+              }
+            return request(app)
+            .post('/api/topics')
+            .send(newTopic)
+            .expect(400)
+            .then(({body: { msg }}) => {
+               expect(msg).toBe("bad request by user"); 
+            })
+        })
+        test('status: 201, responds with correctly posted comment if the user provides an object with a slug and description, but also with additional irrelevant properties.', () => {
+            const newTopic = {
+                slug: "topic name here",
+                description: "description here",
+                irrelevantProperty: "irrelevant value"
+              }
+            return request(app)
+            .post('/api/topics')
+            .send(newTopic)
+            .expect(201)
+            .then(({ body }) => {
+                expect(body.topic).toEqual({
+                    slug: "topic name here",
+                    description: "description here"
+                })
             })
         })
     })

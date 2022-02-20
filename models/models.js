@@ -6,6 +6,16 @@ exports.selectTopics = () => {
     })
 }
 
+exports.addNewTopic = (newTopic) => {
+    if(!newTopic.hasOwnProperty('slug') || !newTopic.hasOwnProperty('description') || newTopic.slug.length === 0 || newTopic.description.length === 0) {
+        return Promise.reject({ status: 400, msg: 'bad request by user'})
+    } else {
+    return db.query('INSERT INTO topics (description, slug) VALUES ($1, $2) RETURNING *;', [newTopic.description, newTopic.slug]).then(({ rows }) => {
+        return rows[0]
+        })
+    }
+}
+
 exports.selectArticle = (id) => {
     return db.query('SELECT articles.*, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id WHERE comments.article_id = $1 GROUP BY articles.article_id;', [id]).then(({ rows }) => {
         if (rows.length === 0) {
@@ -77,4 +87,14 @@ exports.deleteArticleById = (id) => {
     .then(({ rows }) => {
         return rows;
         })
+}
+
+exports.addNewArticle = (newArticle) => {
+    return db.query('INSERT INTO articles (title, topic, author, body) VALUES ($1, $2, $3, $4) RETURNING *;', [newArticle.title, newArticle.topic, newArticle.author, newArticle.body])
+    .then(({ rows }) => {
+        return rows[0];
+    })
+    .then((article) => {
+    return this.checkArticleExists(article.article_id)
+    })
 }

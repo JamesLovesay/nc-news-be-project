@@ -130,5 +130,15 @@
         "created_at": 1586179020000
       }
     }
+  },
+  "POST /api/topics": {
+    "description": "serves up an object containing the details of the topic that the user posts database",
+    "queries": ["slug", "description"],
+    "exampleResponse": {
+      "topic": {
+        "slug": "topic name here",
+        "description": "description here"
+    }
+    }
   }
 }
