@@ -679,6 +679,22 @@ describe('app - global', () => {
             })
             })
         })  
+        test('status: 400, bad request if user tries to delete by an id that is invalid.', () => {
+            return request(app)
+            .delete('/api/comments/not-a-valid-id')
+            .expect(400)
+            .then(({body: { msg }}) => {
+                expect(msg).toBe("bad request"); 
+            })
+        })  
+        test('status: 404, comment not found if passed a valid id but the article does not exist.', () => {
+            return request(app)
+            .delete('/api/comments/89565')
+            .expect(404)
+            .then(({body: { msg }}) => {
+                expect(msg).toBe("404 - Comment not found"); 
+            })
+        })  
     })
 
     describe('GET - /api/users/:username', () => {
