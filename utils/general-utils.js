@@ -1,7 +1,6 @@
 const format = require('pg-format');
 
 exports.checkExists = (table, column, value) => {
-    console.log('Hi')
   // %I is an identifier in pg-format
   const queryStr = format('SELECT * FROM %I WHERE %I = $1;', table, column);
   return db.query(queryStr, [value])

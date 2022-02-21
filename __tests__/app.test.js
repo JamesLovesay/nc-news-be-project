@@ -1078,4 +1078,6 @@ describe('app - global', () => {
             })
         })
     })
+
+    describe('GET /api/')
 });
