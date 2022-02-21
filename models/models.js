@@ -1,3 +1,4 @@
+const { irregular } = require('i/lib/inflections');
 const db = require('../db/connection.js');
 
 exports.selectTopics = () => {
@@ -40,13 +41,13 @@ exports.amendArticleById = (articleId, changesToArticle) => {
 }
 }
 
-exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic) => {
+exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit = 10, p = 1) => {
     const validSortBy = ['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'];
     const validOrder = ['asc', 'desc', 'ASC', 'DESC'];
     const validTopics = ['cats', 'mitch', 'paper'];
 
     if((topic && !validTopics.includes(topic)) || !validSortBy.includes(sort_by) || !validOrder.includes(order)) {
-        if(!validSortBy.includes(sort_by) || !validOrder.includes(order)) {
+        if(!validSortBy.includes(sort_by) || !validOrder.includes(order) || typeof limit !== 'number' || typeof p !== 'number') {
             return Promise.reject({status: 400, msg: 'Invalid sort query'})
         }
         if(topic && !validTopics.includes(topic)) {
@@ -54,12 +55,18 @@ exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic) => {
         }
     } else {
         queryValues = [];
-        let queryStr = `SELECT articles.*, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
+        let queryStr = `SELECT articles.*, CAST(COUNT(articles.article_id) AS INT) AS total_count, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
         if(topic) {
             queryStr += 'WHERE topic = $1 '
             queryValues.push(topic)
         }
-        queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()};`
+        queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`
+        if(limit) {
+                queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`  
+        } else {
+            queryStr += ";"
+        }
+        
         return db.query(queryStr, queryValues)
         .then(({rows}) => {
             return rows

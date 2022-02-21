@@ -1078,4 +1078,15 @@ describe('app - global', () => {
             })
         })
     })
+
+    describe.only('GET /api/articles (pagination)', () => {
+        test('status 200: returns correct object paginated by the specified amount and on the first page', () => {
+            return request(app)
+            .get('/api/articles/?limit=10&p=1')
+            .expect(200)
+            .then(({ body: { articles }}) => {
+                expect(articles).toHaveLength(10)
+            })
+        })
+    })
 });
