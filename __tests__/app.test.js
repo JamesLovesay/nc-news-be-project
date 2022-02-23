@@ -215,7 +215,7 @@ describe('app - global', () => {
             .get('/api/articles')
             .expect(200)
             .then(({ body }) => {
-                expect(body.articles).toHaveLength(12)
+                expect(body.articles).toHaveLength(10)
                 expect(body.articles).toBeSortedBy("created_at", {descending: true});
             })
         })
@@ -227,7 +227,7 @@ describe('app - global', () => {
             .get('/api/articles')
             .expect(200)
             .then(({body: {articles}}) => {
-                expect(articles).toHaveLength(12)
+                expect(articles).toHaveLength(10)
                 articles.forEach((article) => {
                     expect(article).toEqual(
                         expect.objectContaining({
@@ -257,6 +257,7 @@ describe('app - global', () => {
                     body: 'some gifs',
                     created_at: '2020-11-03T09:12:00.000Z',
                     votes: 0,
+                    total_count: 2,
                     comment_count: 2})
                     })
         })
@@ -422,7 +423,7 @@ describe('app - global', () => {
             .get('/api/articles/?sort_by=title&order=desc')
             .expect(200)
             .then(({body: { articles }}) => {
-                expect(articles).toHaveLength(12); 
+                expect(articles).toHaveLength(10); 
                 expect(articles).toBeSortedBy('title', {descending: true})
              })
         })
@@ -431,7 +432,7 @@ describe('app - global', () => {
             .get('/api/articles/?sort_by=body&order=asc')
             .expect(200)
             .then(({body: { articles }}) => {
-                expect(articles).toHaveLength(12); 
+                expect(articles).toHaveLength(10); 
                 expect(articles).toBeSortedBy('body')
              })
         })
@@ -440,7 +441,7 @@ describe('app - global', () => {
             .get('/api/articles/?sort_by=author&order=asc')
             .expect(200)
             .then(({body: { articles }}) => {
-                expect(articles).toHaveLength(12); 
+                expect(articles).toHaveLength(10); 
                 expect(articles).toBeSortedBy('author')
              })
         })
@@ -449,7 +450,7 @@ describe('app - global', () => {
             .get('/api/articles/?sort_by=topic&order=DESC')
             .expect(200)
             .then(({body: { articles }}) => {
-                expect(articles).toHaveLength(12); 
+                expect(articles).toHaveLength(10); 
                 expect(articles).toBeSortedBy('topic', {descending: true})
              })
         })
@@ -458,7 +459,7 @@ describe('app - global', () => {
             .get('/api/articles/?sort_by=created_at&order=ASC')
             .expect(200)
             .then(({body: { articles }}) => {
-                expect(articles).toHaveLength(12); 
+                expect(articles).toHaveLength(10); 
                 expect(articles).toBeSortedBy('created_at')
              })
         })
@@ -467,7 +468,7 @@ describe('app - global', () => {
             .get('/api/articles/?sort_by=votes&order=desc')
             .expect(200)
             .then(({body: { articles }}) => {
-                expect(articles).toHaveLength(12); 
+                expect(articles).toHaveLength(10); 
                 expect(articles).toBeSortedBy('votes', {descending: true})
              })
         })
@@ -484,6 +485,7 @@ describe('app - global', () => {
                 body: "Bastet walks amongst us, and the cats are taking arms!",
                 created_at: expect.any(String),
                 votes: 0,
+                total_count: 2,
                 comment_count: 2
                 })
              })
@@ -526,7 +528,7 @@ describe('app - global', () => {
             .get('/api/articles/?sort_by=body&order=desc&topic=mitch')
             .expect(200)
             .then(({body: { articles }}) => {
-                expect(articles).toHaveLength(11); 
+                expect(articles).toHaveLength(10); 
                 expect(articles).toBeSortedBy('body', {descending: true})
              })
         })
@@ -771,7 +773,7 @@ describe('app - global', () => {
             })
             .then(() => {
             return request(app)
-            .get('/api/articles/')
+            .get('/api/articles/?limit=12')
             .expect(200)
             .then(({ body: { articles } }) => {
                 expect(articles).toHaveLength(11)
@@ -1079,7 +1081,7 @@ describe('app - global', () => {
         })
     })
 
-    describe.only('GET /api/articles (pagination)', () => {
+    describe('GET /api/articles (pagination)', () => {
         test('status 200: returns correct object paginated by the specified amount and on the first page', () => {
             return request(app)
             .get('/api/articles/?limit=10&p=1')
@@ -1087,6 +1089,48 @@ describe('app - global', () => {
             .then(({ body: { articles }}) => {
                 expect(articles).toHaveLength(10)
             })
+        })
+    })
+    describe('GET /api/articles (pagination)', () => {
+        test('status 200: returns correct object paginated by the specified amount and on the relevant page if filters and sorts are indicated', () => {
+            return request(app)
+            .get('/api/articles/?limit=1&p=2&sort_by=title&order=desc&topic=mitch')
+            .expect(200)
+            .then(({ body: { articles }}) => {
+                expect(articles).toHaveLength(1)
+                expect(articles[0]).toEqual({
+                    article_id: 9,
+                    title: "They're not exactly dogs, are they?",
+                    topic: 'mitch',
+                    author: 'butter_bridge',
+                    body: 'Well? Think about it.',
+                    created_at: '2020-06-06T09:10:00.000Z',
+                    votes: 0,
+                    total_count: 2,
+                    comment_count: 2
+                  })
+            })
+        })
+    })
+    test('status 200: returns correct object paginated by the specified amount and on the relevant page if filtered by topic mitch, sorted by body in ascending order and selecting page 11', () => {
+        return request(app)
+        .get('/api/articles/?limit=1&p=11&sort_by=body&order=desc&topic=mitch')
+        .expect(200)
+        .then(({ body: { articles }}) => {
+            console.log(articles)
+            expect(articles).toHaveLength(1)
+            expect(articles).toBeSortedBy('body', {descending: true})
+            expect(articles[0]).toEqual({
+                article_id: 8,
+                title: 'Does Mitch predate civilisation?',
+                topic: 'mitch',
+                author: 'icellusedkars',
+                body: 'Archaeologists have uncovered a gigantic statue from the dawn of humanity, and it has an uncanny resemblance to Mitch. Surely I am not the only person who can see this?!',
+                created_at: '2020-04-17T01:08:00.000Z',
+                votes: 0,
+                total_count: 1,
+                comment_count: 0
+              })
         })
     })
 });
