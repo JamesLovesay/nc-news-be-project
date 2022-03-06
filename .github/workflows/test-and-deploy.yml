@@ -28,4 +28,4 @@ jobs:
           postgresql password: pa55word
 
       - name: Test Utils and App
-        run: PGDATABASE=test_db PGPASSWORD=pa55word npm test
+        run: PGDATABASE=test_db PGUSER=mr_testerson PGPASSWORD=pa55word npm test
