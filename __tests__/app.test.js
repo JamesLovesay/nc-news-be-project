@@ -106,7 +106,7 @@ describe('app - global', () => {
                     topic: "mitch",
                     author: "butter_bridge",
                     body: "I find this existence challenging",
-                    created_at: "2020-07-09T20:11:00.000Z",
+                    created_at: expect.any(String),
                     votes: 101,
                   })
             })
