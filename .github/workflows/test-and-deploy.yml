@@ -19,6 +19,13 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
-        
-      - name: Test Utils
-        run: npm test utils
+
+      - name: Setup PSQL
+        uses: harmon758/postgresql-action@v1
+        with: 
+          postgresql db: test_db
+          postgresql user: mr_testerson
+          postgresql password: pa55word
+
+      - name: Test Utils and App
+        run: PGDATABASE=test_db PGPASSWORD=pa55word npm test
