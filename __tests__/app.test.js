@@ -1117,7 +1117,6 @@ describe('app - global', () => {
         .get('/api/articles/?limit=1&p=11&sort_by=body&order=desc&topic=mitch')
         .expect(200)
         .then(({ body: { articles }}) => {
-            console.log(articles)
             expect(articles).toHaveLength(1)
             expect(articles).toBeSortedBy('body', {descending: true})
             expect(articles[0]).toEqual({
