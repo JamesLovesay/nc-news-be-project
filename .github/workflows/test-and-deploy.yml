@@ -17,7 +17,7 @@ jobs:
       - name: Setup timezone
         uses: zcong1993/setup-timezone@master
         with:
-          timezone: timezoneLinux
+          timezone: Europe/London
 
       - name: Checkout and clone repo
         uses: actions/checkout@v2
