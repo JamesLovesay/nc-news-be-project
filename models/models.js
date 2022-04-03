@@ -44,6 +44,7 @@ exports.amendArticleById = (articleId, changesToArticle) => {
 exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit = 10, p = 1) => {
     const validSortBy = ['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes'];
     const validOrder = ['asc', 'desc', 'ASC', 'DESC'];
+    
     if(!validSortBy.includes(sort_by) || !validOrder.includes(order) || typeof parseInt(limit) !== 'number' || typeof parseInt(p) !== 'number') {
     return Promise.reject({status: 400, msg: 'Invalid sort query'})
     }
