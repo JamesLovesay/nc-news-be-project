@@ -12,7 +12,7 @@ The project is an api with multiple endpoints that allow the user to interact wi
 
 2 - Dependencies can be installed using the command `npm install`. You will need to ensure that PostgreSQL is installed on your machine and that the server is started using the applicable command for your machine, depending on whether you are using a Mac, Windows or Linux machine. Please use the following link to access instructions on how to do this. https://tableplus.com/blog/2018/10/how-to-start-stop-restart-postgresql-server.html. 
     
-The dependencies relied upon by this project are: 
+The dependencies relied upon by this project include: 
 
 - jest
 - dotenv
