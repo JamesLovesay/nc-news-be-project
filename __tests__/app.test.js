@@ -269,7 +269,7 @@ describe('app - global', () => {
             .get('/api/articles/1/comments')
             .expect(200)
             .then(({ body: { comments } }) => {
-                expect(comments).toHaveLength(11)
+                expect(comments).toHaveLength(10)
                 comments.forEach((comment) => {
                     expect(comment).toEqual(
                         expect.objectContaining({
@@ -1130,6 +1130,64 @@ describe('app - global', () => {
                 total_count: 1,
                 comment_count: 0
               })
+        })
+    })
+    describe('GET /api/articles/:article_id/comments (pagination)', () => {
+        test('status 200: returns object containing one comment if passed a limit of 1 and a p of 1', () => {
+            return request(app)
+            .get('/api/articles/1/comments?limit=1&p=1')
+            .expect(200)
+            .then(({body: {comments}}) => {
+                expect(comments).toHaveLength(1)
+            })
+        })
+        test('status 200: returns only the first ten comments if passed article 1 and no limit or p', () => {
+            return request(app)
+                .get('/api/articles/1/comments')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                    expect(comments).toHaveLength(10)
+                })
+        })
+        test('status 200: returns correct comment if passed article 1, no limit and a p of 2', () => {
+            return request(app)
+                .get('/api/articles/1/comments?p=2')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                    expect(comments).toHaveLength(1)
+                    expect(comments[0]).toEqual({
+                        comment_id: 18,
+                        votes: 16,
+                        created_at: '2020-07-21T00:20:00.000Z',
+                        author: 'butter_bridge',
+                        body: 'This morning, I showered for nine minutes.'
+                    })
+                })
+        })
+        test('status 200: returns correct comment if passed article 1, limit of 1 and a p of 11', () => {
+            return request(app)
+                .get('/api/articles/1/comments?p=2')
+                .expect(200)
+                .then(({ body: { comments } }) => {
+                    expect(comments).toHaveLength(1)
+                    expect(comments[0]).toEqual({
+                        comment_id: 18,
+                        votes: 16,
+                        created_at: '2020-07-21T00:20:00.000Z',
+                        author: 'butter_bridge',
+                        body: 'This morning, I showered for nine minutes.'
+                    })
+                })
+        })
+        test('status 500: returns message of server error if passed a limit that is not a number', () => {
+            return request(app)
+                .get('/api/articles/1/comments?limit="notanumber"&p=2')
+                .expect(500)
+        })
+        test('status 500: returns message of server error if passed a p that is not a number', () => {
+            return request(app)
+                .get('/api/articles/1/comments?p=notanumber')
+                .expect(500)
         })
     })
 });
