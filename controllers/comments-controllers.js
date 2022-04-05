@@ -4,7 +4,8 @@ const { checkCommentExists } = require('../utils/comments-utils.js')
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const { article_id: articleId } = req.params;
-    Promise.all([selectCommentsByArticleId(articleId), checkArticleExists(articleId)])
+    const { limit, p } = req.query;
+    Promise.all([selectCommentsByArticleId(articleId, limit, p), checkArticleExists(articleId)])
     .then(([comments]) => {
         res.status(200).send({comments})
     })
