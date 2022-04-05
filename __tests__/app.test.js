@@ -254,7 +254,7 @@ describe('app - global', () => {
                     title: 'Eight pug gifs that remind me of mitch',
                     topic: 'mitch',
                     author: 'icellusedkars',
-                    body: 'some gifs',
+                    body: 'Some gifs',
                     created_at: '2020-11-03T09:12:00.000Z',
                     votes: 0,
                     total_count: 2,

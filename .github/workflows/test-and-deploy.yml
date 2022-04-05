@@ -34,3 +34,11 @@ jobs:
 
       - name: Test Utils and App
         run: PGDATABASE=test_db PGUSER=mr_testerson PGPASSWORD=pa55word npm test
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    uses: akhileshns/heroku-deploy@v3.12.12
+    with: 
+      heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+      heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+      heroku_email: ${{secrets.HEROKU_EMAIL}}

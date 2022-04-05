@@ -19,7 +19,7 @@ module.exports = [
     title: "Eight pug gifs that remind me of mitch",
     topic: "mitch",
     author: "icellusedkars",
-    body: "some gifs",
+    body: "Some gifs",
     created_at: 1604394720000,
     votes: 0,
   },
