@@ -55,40 +55,34 @@ exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit =
             return Promise.reject({ status: 404, msg: "404 - topic not found" })
             } else {
                     queryValues = [];
-    let queryStr = `SELECT articles.*, CAST(COUNT(articles.article_id) AS INT) AS total_count, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
-    if(topic) {
-        queryStr += 'WHERE topic = $1 '
-        queryValues.push(topic)
-    }
-    queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`
-    if(limit) {
-            queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`  
-    } else {
-        queryStr += ";"
-    }
+        let queryStr = `SELECT articles.*, CAST(COUNT(articles.article_id) AS INT) AS total_count, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
+        if(topic) {
+            queryStr += 'WHERE topic = $1 '
+            queryValues.push(topic)
+        }
+        queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`
+        if(limit) {
+                queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`  
+        } else {
+            queryStr += ";"
+        }
 
-    return db.query(queryStr, queryValues)
-    .then(({rows}) => {
-    return rows
-    })
-            }
+        return db.query(queryStr, queryValues)
+        .then(({rows}) => {
+        return rows
         })
+                }
+            })
     } 
 
-    queryValues = [];
-    let queryStr = `SELECT articles.*, CAST(COUNT(articles.article_id) AS INT) AS total_count, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
-    if(topic) {
-        queryStr += 'WHERE topic = $1 '
-        queryValues.push(topic)
-    }
-    queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`
+    let queryStr = `SELECT articles.*, CAST(COUNT(articles.article_id) AS INT) AS total_count, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`;
     if(limit) {
             queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`  
     } else {
         queryStr += ";"
     }
 
-    return db.query(queryStr, queryValues)
+    return db.query(queryStr)
     .then(({rows}) => {
     return rows
     })
