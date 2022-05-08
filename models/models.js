@@ -40,7 +40,7 @@ exports.amendArticleById = (articleId, changesToArticle) => {
 }
 }
 
-exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit = 10, p = 1) => {
+exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit = 10, p = 1, author) => {
     const validSortBy = ['article_id', 'title', 'topic', 'author', 'body', 'created_at', 'votes', 'comment_count'];
     const validOrder = ['asc', 'desc', 'ASC', 'DESC'];
     
@@ -49,43 +49,76 @@ exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit =
     }
 
     if(topic) {
+    // Initial query to the database if there is a topic, to ensure it is a valid topic and to prevent injection if a topic is entered manually to the api.
+
     return db.query('SELECT * FROM topics WHERE slug = $1;', [topic])
     .then(({ rows }) => {
         if (rows.length === 0) {
-            return Promise.reject({ status: 404, msg: "404 - topic not found" })
-            } else {
-                    queryValues = [];
+        return Promise.reject({ status: 404, msg: "404 - topic not found" })
+        } 
+
+    // Query database if the topic is valid.
+
+        let queryValues = [];
         let queryStr = `SELECT articles.*, CAST(COUNT(articles.article_id) AS INT) AS total_count, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
-        if(topic) {
+
+        if(topic && !author) {
             queryStr += 'WHERE topic = $1 '
             queryValues.push(topic)
         }
+        if(!topic && author) {
+            queryStr += 'WHERE articles.author = $1 '
+            queryValues.push(author)
+        }
+        if (topic && author) {
+            queryStr += 'WHERE topic = $1 AND articles.author = $2 '
+            queryValues.push(topic)
+            queryValues.push(author)
+        }
+
         queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`
+
         if(limit) {
-                queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`  
+            queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`  
         } else {
             queryStr += ";"
         }
-
+        console.log(queryStr)
+        console.log(queryValues)
         return db.query(queryStr, queryValues)
         .then(({rows}) => {
-        return rows
+            console.log(rows)
+            return rows
         })
-                }
-            })
-    } 
-
-    let queryStr = `SELECT articles.*, CAST(COUNT(articles.article_id) AS INT) AS total_count, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`;
-    if(limit) {
-            queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`  
-    } else {
-        queryStr += ";"
-    }
-
-    return db.query(queryStr)
-    .then(({rows}) => {
-    return rows
     })
+
+    } else {
+        // Alternate query to the database if there is no topic
+
+        let queryValues = [];
+        let queryStr = `SELECT articles.*, CAST(COUNT(articles.article_id) AS INT) AS total_count, CAST(COUNT(comments.comment_id) AS INT) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id `;
+        
+        if(author) {
+            queryStr += `WHERE articles.author = $1 `
+            queryValues.push(author)
+        }
+
+        queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`;
+
+        if (limit) {
+            queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`
+        } else {
+            queryStr += ";"
+        }
+        console.log(queryStr)
+        console.log(queryValues)
+        return db.query(queryStr, queryValues)
+        .then(({ rows }) => {
+            console.log(rows)
+            return rows
+        })
+
+    }
 } 
 
 
