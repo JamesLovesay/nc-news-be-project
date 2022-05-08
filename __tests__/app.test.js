@@ -532,7 +532,7 @@ describe('app - global', () => {
                 expect(articles).toBeSortedBy('body', {descending: true})
              })
         })
-        test.only('status: 200, responds with correctly sorted array of objects if passed a valid query inclusing a topic and an author', () => {
+        test('status: 200, responds with correctly sorted array of objects if passed a valid query inclusing a topic and an author', () => {
             return request(app)
                 .get('/api/articles/?topic=mitch&author=butter_bridge')
                 .expect(200)
