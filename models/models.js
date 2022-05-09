@@ -88,7 +88,7 @@ exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit =
             return rows
         })
     })
-    
+
     } else {
         // Alternate query to the database if there is no topic
 
@@ -148,3 +148,4 @@ exports.addNewArticle = (newArticle) => {
         return rows[0];
     })
 }
+ 
