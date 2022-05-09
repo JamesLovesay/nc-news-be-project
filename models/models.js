@@ -148,4 +148,4 @@ exports.addNewArticle = (newArticle) => {
         return rows[0];
     })
 }
- 
+  
