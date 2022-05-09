@@ -532,6 +532,30 @@ describe('app - global', () => {
                 expect(articles).toBeSortedBy('body', {descending: true})
              })
         })
+        test('status: 200, responds with correctly sorted array of objects if passed a valid query including a topic and an author', () => {
+            return request(app)
+                .get('/api/articles/?topic=mitch&author=butter_bridge')
+                .expect(200)
+                .then(({ body: { articles } }) => {
+                    expect(articles).toHaveLength(3);
+                })
+        })
+        test('status: 200, responds with correctly sorted array of objects if passed a valid complex query including a topic, an author, limit, p and sort_by', () => {
+            return request(app)
+                .get('/api/articles/?topic=cats&author=rogersop&limit=5&p=1&sort_by=title')
+                .expect(200)
+                .then(({ body: { articles } }) => {
+                    expect(articles).toHaveLength(1);
+                })
+        })
+        test('status: 200, responds with correctly sorted array of objects if passed a valid complex query including no topic, an author, limit, p and sort_by', () => {
+            return request(app)
+                .get('/api/articles/?&author=icellusedkars&limit=3&sort_by=title')
+                .expect(200)
+                .then(({ body: { articles } }) => {
+                    expect(articles).toHaveLength(3);
+                })
+        })
     })
       
     describe('GET - /api', () => {
