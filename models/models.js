@@ -49,6 +49,7 @@ exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit =
     }
 
     if(topic) {
+
     // Initial query to the database if there is a topic, to ensure it is a valid topic and to prevent injection if a topic is entered manually to the api.
 
     return db.query('SELECT * FROM topics WHERE slug = $1;', [topic])
@@ -77,21 +78,17 @@ exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit =
         }
 
         queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order.toUpperCase()}`
-
         if(limit) {
             queryStr += ` LIMIT ${limit} OFFSET (${p} - 1) * ${limit};`  
         } else {
             queryStr += ";"
         }
-        console.log(queryStr)
-        console.log(queryValues)
         return db.query(queryStr, queryValues)
         .then(({rows}) => {
-            console.log(rows)
             return rows
         })
     })
-
+    
     } else {
         // Alternate query to the database if there is no topic
 
@@ -110,11 +107,8 @@ exports.selectArticles = (sort_by = 'created_at', order = 'DESC', topic, limit =
         } else {
             queryStr += ";"
         }
-        console.log(queryStr)
-        console.log(queryValues)
         return db.query(queryStr, queryValues)
         .then(({ rows }) => {
-            console.log(rows)
             return rows
         })
 
